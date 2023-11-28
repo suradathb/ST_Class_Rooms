@@ -1,7 +1,7 @@
 from typing import Union
 from fastapi import FastAPI
-from app.routers import maketaccount
-# from routers import maketaccount
+from app.routers import studencheckinclassroom
+# from routers import studencheckinclassroom
 import json
 
 app = FastAPI()
@@ -12,6 +12,6 @@ app = FastAPI()
 #     return {"Hello": "World"}
 
 def config_router():
-    app.include_router(maketaccount.router)
+    app.include_router(studencheckinclassroom.router)
 
 config_router()
