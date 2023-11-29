@@ -20,9 +20,9 @@ def check_attendance(names_to_check):
         result.append({"name": name, "status": "Attended" if found else "Not Enrolled"})
     return result
 
-@router.get("/")
-def read_root():
-    return {"Hello": "World"}
+# @router.get("/")
+# def read_root():
+#     return {"Hello": "World"}
 
 @router.post("/upload-names/")
 async def upload_names(file: UploadFile = File(...)):
@@ -31,8 +31,19 @@ async def upload_names(file: UploadFile = File(...)):
     lines = contents.decode('utf-8').split(',')
 
     new_students = [{"name": line.strip(), "status": "Not Enrolled"} for line in lines]
-    students_data.extend(new_students)
-    return {"message": "Names uploaded successfully."}
+
+    added_students = []
+    for new_students in new_students:
+        if any(new_students['name'].lower() == student['name'].lower() for student in students_data):
+            # Duplicate found, skip adding to students_data
+            continue
+        else:
+            # Not a duplicate, add to students_data
+            students_data.append(new_students)
+            added_students.append(new_students)
+    return {"message": "Names uploaded successfully.", "added_students": added_students}
+    # students_data.extend(new_students)
+    # return {"message": "Names uploaded successfully."}
 
 @router.post("/check-attendance/")
 async def check_attendance_endpoint(names: List[str]):
