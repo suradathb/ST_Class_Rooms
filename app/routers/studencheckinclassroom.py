@@ -20,30 +20,25 @@ def check_attendance(names_to_check):
         result.append({"name": name, "status": "Attended" if found else "Not Enrolled"})
     return result
 
-# @router.get("/")
-# def read_root():
-#     return {"Hello": "World"}
 
 @router.post("/upload-names/")
 async def upload_names(file: UploadFile = File(...)):
-
     contents = await file.read()
     lines = contents.decode('utf-8').split(',')
 
     new_students = [{"name": line.strip(), "status": "Not Enrolled"} for line in lines]
 
     added_students = []
-    for new_students in new_students:
-        if any(new_students['name'].lower() == student['name'].lower() for student in students_data):
+    for new_student in new_students:
+        if any(new_student['name'].lower() == student['name'].lower() for student in students_data):
             # Duplicate found, skip adding to students_data
             continue
         else:
             # Not a duplicate, add to students_data
-            students_data.append(new_students)
-            added_students.append(new_students)
+            students_data.append(new_student)
+            added_students.append(new_student)
+
     return {"message": "Names uploaded successfully.", "added_students": added_students}
-    # students_data.extend(new_students)
-    # return {"message": "Names uploaded successfully."}
 
 @router.post("/check-attendance/")
 async def check_attendance_endpoint(names: List[str]):
@@ -95,6 +90,11 @@ async def generate_attendance_report():
     save_to_excel(students_data, filename)
     return FileResponse(filename, media_type="application/octet-stream", filename=filename)
 
+
 def save_to_excel(data, filename):
     df = pd.DataFrame(data)
     df.to_excel(filename, index=False)
+
+@router.get("/generate-show/")
+async def generate_table_report():
+    return students_data
